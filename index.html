@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ephemeral — peer-to-peer chat</title>
+  <link rel="stylesheet" href="style.css?v=2">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sidebar-head" style="display: flex; justify-content: space-between; align-items: flex-start;">
+      <div class="logo" style="flex:1;">
+        <div class="logo-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div>
+          <h1>Ephemeral</h1>
+          <p>Private peer-to-peer chat</p>
+        </div>
+      </div>
+      <button class="icon-btn mobile-close-btn" onclick="toggleSidebar()" style="display:none; margin-left: 8px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-label">Actions</div>
+      <button class="nav-btn" id="navNewChat" onclick="newChat()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        New chat
+      </button>
+      <button class="nav-btn" id="navExit" onclick="exitChat()" disabled>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Exit chat
+      </button>
+      <div class="nav-divider"></div>
+      <div class="nav-label">Settings</div>
+      <button class="nav-btn" onclick="toggleTheme()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        Toggle dark mode
+      </button>
+      <div class="nav-divider"></div>
+      <div class="nav-label">Help</div>
+      <button class="nav-btn" id="navDocs" onclick="showDocs()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Help &amp; docs
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      Built by <strong>Zrnge</strong><br>
+      <a href="https://zrnge.github.io/p2p-chat" target="_blank">Project Page</a> &bull; 
+      <a href="https://github.com/zrnge/p2p-chat" target="_blank">Repository</a>
+    </div>
+  </aside>
+
+  <div class="workspace">
+    <header class="topbar">
+      <button class="icon-btn" onclick="toggleSidebar()" style="margin-right: 8px;" title="Toggle sidebar" aria-label="Toggle sidebar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="peer-avatar" id="avatar">E</div>
+      <div class="topbar-info">
+        <div class="topbar-title" id="headerTitle">New conversation</div>
+        <div class="topbar-status">
+          <span class="status-dot" id="dot"></span>
+          <span id="status">Offline</span>
+        </div>
+      </div>
+      <span class="badge">E2E encrypted</span>
+      <div class="topbar-actions">
+        <button class="icon-btn" id="mobNewChat" onclick="newChat()" title="New chat" aria-label="New chat">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <button class="icon-btn" id="mobExit" onclick="exitChat()" disabled title="Exit chat" aria-label="Exit chat">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+        <button class="icon-btn" id="mobDocs" onclick="showDocs()" title="Help & docs" aria-label="Help and docs">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </button>
+        <button class="icon-btn" onclick="toggleTheme()" title="Toggle dark mode" aria-label="Toggle dark mode">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="content">
+      <section class="setup" id="setup">
+        <div class="setup-inner">
+          <div class="welcome">
+        <h2>Ephemeral</h2>
+        <p>A serverless, end-to-end encrypted chat powered by WebRTC. No data is stored, and your messages travel directly between peers.</p>
+      </div>
+
+          <div class="role-pick">
+            <button class="role-btn" id="roleA" onclick="pickRole('A')">
+              <div class="icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+              </div>
+              <b>Start a channel</b>
+              <span>Generate an invite with QR code for your peer.</span>
+            </button>
+            <button class="role-btn" id="roleB" onclick="pickRole('B')">
+              <div class="icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+              </div>
+              <b>Join a channel</b>
+              <span>Scan a QR code or paste the invite text.</span>
+            </button>
+          </div>
+
+          <div class="step" id="A1">
+            <div class="step-card">
+              <div class="step-title"><span class="step-badge">1</span> Share your invitation</div>
+              <div class="invite-share">
+                <div class="qr-wrap">
+                  <div class="qr-frame" id="A_qr_frame">
+                    <canvas id="A_qr"></canvas>
+                  </div>
+                  <div class="qr-label">Scan with phone camera</div>
+                </div>
+                <div class="code-wrap">
+                  <label>Invitation code</label>
+                  <textarea id="A_offer" readonly placeholder="Generating invite…"></textarea>
+                  <div class="actions">
+                    <button class="btn btn-primary" onclick="copyEl('A_offer')">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                      Copy code
+                    </button>
+                    <span class="copied" id="A_copied"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="step" id="A2">
+            <div class="step-card">
+              <div class="step-title"><span class="step-badge">2</span> Paste your peer's reply</div>
+              <textarea id="A_answer" placeholder="Paste the reply code your peer sends back"></textarea>
+              <div class="actions">
+                <button class="btn btn-primary" onclick="hostAccept()">Connect</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="step" id="B1">
+            <div class="step-card">
+              <div class="step-title"><span class="step-badge">1</span> Enter the invitation</div>
+              <textarea id="B_offer" placeholder="Paste the invite code or scan the QR and paste here"></textarea>
+              <div class="actions">
+                <button class="btn btn-primary" onclick="joinGenerate()">Generate reply</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="step" id="B2">
+            <div class="step-card">
+              <div class="step-title"><span class="step-badge">2</span> Send this reply to your peer</div>
+              <div class="invite-share">
+                <div class="qr-wrap">
+                  <div class="qr-frame" id="B_qr_frame">
+                    <canvas id="B_qr"></canvas>
+                  </div>
+                  <div class="qr-label">Scan with phone camera</div>
+                </div>
+                <div class="code-wrap">
+                  <label>Reply code</label>
+                  <textarea id="B_answer" readonly></textarea>
+                  <div class="actions">
+                    <button class="btn btn-primary" onclick="copyEl('B_answer')">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                      Copy code
+                    </button>
+                    <span class="copied" id="B_copied"></span>
+                    <span class="hint">Connection opens once they paste it.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="chat" id="chat">
+        <div class="messages" id="log"></div>
+        <div class="composer">
+          <input type="file" id="fileInput" style="display: none">
+          <button class="icon-btn" id="attachBtn" onclick="document.getElementById('fileInput').click()" disabled aria-label="Attach file" title="Attach small file">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+          </button>
+          <div class="composer-box">
+            <textarea id="input" placeholder="Type a message" disabled rows="1"></textarea>
+          </div>
+          <button class="send-btn" id="send" onclick="send()" disabled aria-label="Send">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <section class="docs" id="docs">
+        <div class="docs-header">
+          <button class="docs-back" onclick="backFromDocs()" aria-label="Go back">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div class="docs-header-text">
+            <h2>Help &amp; documentation</h2>
+            <p>Everything you need to know about Ephemeral chat.</p>
+          </div>
+        </div>
+        <div class="docs-body">
+          <div class="docs-inner">
+            <div class="doc-card">
+              <h3><span class="doc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span> How it works</h3>
+              <ul>
+                <li>Direct browser-to-browser connection using WebRTC</li>
+                <li>No central server stores your messages</li>
+                <li>Share invites via QR code or text code</li>
+                <li>Once connected, chat in real time like any messenger</li>
+              </ul>
+            </div>
+            <div class="doc-card">
+              <h3><span class="doc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span> Getting started</h3>
+              <ol>
+                <li>Click <strong>Start a channel</strong> to create an invite, or <strong>Join a channel</strong> if you received one.</li>
+                <li>Share the QR code or invitation text with your peer.</li>
+                <li>The joiner generates a reply code and sends it back.</li>
+                <li>Once both sides connect, you can start chatting.</li>
+              </ol>
+            </div>
+            <div class="doc-card">
+              <h3><span class="doc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span> Privacy</h3>
+              <p>Messages live only in this browser tab's memory. Close the tab and the conversation is gone — no server, no database, no history. Your peer can still copy, screenshot, or save what you send.</p>
+            </div>
+            <div class="doc-card">
+              <h3><span class="doc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span> Security</h3>
+              <p>Each session generates a fresh ECDH keypair (P-256). Encryption keys are agreed directly between the two browsers and never sent anywhere. When the channel opens, both sides see a <strong>safety number</strong> — compare it out loud with your peer to confirm no one is intercepting the connection.</p>
+            </div>
+            <div class="doc-card">
+              <h3><span class="doc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span> QR codes</h3>
+              <p>When you start a channel, a QR code is generated alongside the text invite. Your peer can scan it with their phone camera, then paste the decoded text into the join field. If the code is too large for a QR, use the text code instead.</p>
+            </div>
+            <div class="doc-card">
+              <h3><span class="doc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Chat actions</h3>
+              <ul>
+                <li><strong>New chat</strong> — end the current session and start fresh with someone else</li>
+                <li><strong>Exit chat</strong> — leave the active conversation and return to setup</li>
+                <li><strong>Help &amp; docs</strong> — open this page anytime from the sidebar</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script src="qr.js"></script>
+<script>
+if (window.innerWidth <= 900) {
+  document.querySelector('.sidebar').classList.add('collapsed');
+}
+
+const ICE = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
+const COMPRESS_PREFIX = "eph1:";
+let pc, dc, role, key = null;
+let currentView = "setup";
+let sessionActive = false;
+let viewBeforeDocs = "setup";
+
+const $ = id => document.getElementById(id);
+const dot = $("dot"), statusEl = $("status"), headerTitle = $("headerTitle"), avatar = $("avatar");
+
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('collapsed');
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+}
+
+if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+  document.documentElement.setAttribute('data-theme', 'dark');
+}
+
+function setStatus(t, live) {
+  statusEl.textContent = t;
+  dot.classList.toggle("live", !!live);
+}
+
+function updateNavState() {
+  const inSession = sessionActive || (pc && pc.connectionState !== "closed");
+  const canExit = currentView === "chat" || inSession;
+  $("navExit").disabled = !canExit;
+  $("mobExit").disabled = !canExit;
+  $("navDocs").classList.toggle("active", currentView === "docs");
+  $("mobDocs").classList.toggle("active", currentView === "docs");
+}
+
+function showView(view) {
+  currentView = view;
+  $("setup").style.display = view === "setup" ? "flex" : "none";
+  $("chat").classList.toggle("on", view === "chat");
+  $("docs").classList.toggle("on", view === "docs");
+  updateNavState();
+}
+
+function showDocs() {
+  if (currentView !== "docs") viewBeforeDocs = currentView;
+  showView("docs");
+}
+
+function backFromDocs() {
+  showView(viewBeforeDocs);
+}
+
+function showSetup() {
+  showView("setup");
+}
+
+function closeConnection() {
+  try { dc && dc.close(); } catch {}
+  try { pc && pc.close(); } catch {}
+  dc = null;
+  pc = null;
+}
+
+function resetForms() {
+  ["A_offer","A_answer","B_offer","B_answer"].forEach(id => { $(id).value = ""; });
+  ["A1","A2","B1","B2"].forEach(s => $(s).classList.remove("on"));
+  $("roleA").classList.remove("sel");
+  $("roleB").classList.remove("sel");
+  ["A_copied","B_copied"].forEach(id => { $(id).textContent = ""; });
+  ["A_qr_frame","B_qr_frame"].forEach(id => {
+    const frame = $(id);
+    if (!frame) return;
+    frame.classList.remove("qr-fail");
+    const msg = frame.querySelector(".qr-fail-msg");
+    if (msg) msg.remove();
+    const canvas = frame.querySelector("canvas");
+    if (canvas) { canvas.width = 0; canvas.height = 0; canvas.style.display = "block"; }
+  });
+}
+
+function resetSession() {
+  closeConnection();
+  key = null;
+  role = null;
+  myKeyPair = null;
+  myPubJwkB64 = null;
+  safetyNumber = "";
+  sessionActive = false;
+  $("log").innerHTML = "";
+  $("input").value = "";
+  $("input").style.height = "22px";
+  $("input").disabled = true;
+  $("send").disabled = true;
+  $("attachBtn").disabled = true;
+  headerTitle.textContent = "New conversation";
+  avatar.textContent = "E";
+  resetForms();
+  setStatus("Offline");
+}
+
+function exitChat() {
+  if (currentView !== "chat" && !sessionActive) return;
+  if (!confirm("Leave this chat? The conversation will be lost.")) return;
+  resetSession();
+  showSetup();
+}
+
+function newChat() {
+  if (sessionActive || currentView === "chat") {
+    if (!confirm("Start a new chat? Your current conversation will be lost.")) return;
+  }
+  resetSession();
+  showSetup();
+}
+
+/* ---------- compression (fits large invites into QR) ---------- */
+async function compressCode(str) {
+  if (!window.CompressionStream) return str;
+  try {
+    const bytes = new TextEncoder().encode(str);
+    const stream = new Blob([bytes]).stream().pipeThrough(new CompressionStream("deflate"));
+    const buf = await new Response(stream).arrayBuffer();
+    const arr = new Uint8Array(buf);
+    let bin = "";
+    for (let i = 0; i < arr.length; i++) bin += String.fromCharCode(arr[i]);
+    return COMPRESS_PREFIX + btoa(bin);
+  } catch { return str; }
+}
+
+async function decompressCode(str) {
+  if (!str.startsWith(COMPRESS_PREFIX)) return str;
+  if (!window.DecompressionStream) throw new Error("compressed");
+  const bin = atob(str.slice(COMPRESS_PREFIX.length));
+  const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate"));
+  const buf = await new Response(stream).arrayBuffer();
+  return new TextDecoder().decode(buf);
+}
+
+async function pack(sdp, pub) {
+  const raw = btoa(JSON.stringify({ s: sdp, k: pub }));
+  return compressCode(raw);
+}
+
+async function unpack(str) {
+  const t = str.trim();
+  const raw = t.startsWith(COMPRESS_PREFIX) ? await decompressCode(t) : t;
+  return JSON.parse(atob(raw));
+}
+
+/* ---------- QR rendering (local qr.js, no CDN) ---------- */
+function renderQR(canvasId, frameId, text) {
+  const canvas = $(canvasId);
+  const frame = $(frameId);
+  if (!canvas || !frame || !text) return;
+
+  frame.classList.remove("qr-fail");
+  const existing = frame.querySelector(".qr-fail-msg");
+  if (existing) existing.remove();
+  canvas.style.display = "block";
+
+  try {
+    const qr = qrcode(0, "L");
+    qr.addData(text);
+    qr.make();
+    const n = qr.getModuleCount();
+    const margin = 2;
+    const cell = Math.max(2, Math.floor(180 / (n + margin * 2)));
+    const size = (n + margin * 2) * cell;
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, size, size);
+    ctx.fillStyle = "#111b21";
+    for (let r = 0; r < n; r++) {
+      for (let c = 0; c < n; c++) {
+        if (qr.isDark(r, c)) {
+          ctx.fillRect((c + margin) * cell, (r + margin) * cell, cell, cell);
+        }
+      }
+    }
+  } catch {
+    canvas.style.display = "none";
+    frame.classList.add("qr-fail");
+    const msg = document.createElement("div");
+    msg.className = "qr-fail-msg";
+    msg.textContent = "Code too large for QR — use the text code below";
+    frame.appendChild(msg);
+  }
+}
+
+function showInviteCode(textareaId, canvasId, frameId, text) {
+  $(textareaId).value = text;
+  renderQR(canvasId, frameId, text);
+}
+
+/* ---------- crypto ---------- */
+let myKeyPair = null;
+let myPubJwkB64 = null;
+
+async function genKeyPair() {
+  myKeyPair = await crypto.subtle.generateKey(
+    { name: "ECDH", namedCurve: "P-256" }, false, ["deriveKey", "deriveBits"]
+  );
+  const jwk = await crypto.subtle.exportKey("jwk", myKeyPair.publicKey);
+  myPubJwkB64 = btoa(JSON.stringify(jwk));
+  return myPubJwkB64;
+}
+
+async function deriveSharedKey(peerPubB64) {
+  const jwk = JSON.parse(atob(peerPubB64));
+  const peerPub = await crypto.subtle.importKey(
+    "jwk", jwk, { name: "ECDH", namedCurve: "P-256" }, false, []
+  );
+  const bits = await crypto.subtle.deriveBits(
+    { name: "ECDH", public: peerPub }, myKeyPair.privateKey, 256
+  );
+  const hkdfBase = await crypto.subtle.importKey("raw", bits, "HKDF", false, ["deriveKey"]);
+  key = await crypto.subtle.deriveKey(
+    { name: "HKDF", hash: "SHA-256", salt: new Uint8Array(0), info: new TextEncoder().encode("ephemeral-p2p-aes") },
+    hkdfBase, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]
+  );
+  await computeSafetyNumber(peerPubB64);
+}
+
+let safetyNumber = "";
+async function computeSafetyNumber(peerPubB64) {
+  const both = [myPubJwkB64, peerPubB64].sort().join("|");
+  const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(both));
+  const bytes = new Uint8Array(hash);
+  let digits = "";
+  for (let i = 0; i < 40; i++) digits += (bytes[i % bytes.length] % 10).toString();
+  safetyNumber = digits.match(/.{1,5}/g).join(" ");
+}
+
+async function encrypt(text) {
+  if (!key) return JSON.stringify({ p: text });
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const data = new TextEncoder().encode(text);
+  const ct = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, data);
+  return JSON.stringify({ e: btoa(String.fromCharCode(...new Uint8Array(ct))), iv: btoa(String.fromCharCode(...iv)) });
+}
+async function decrypt(payload) {
+  const obj = JSON.parse(payload);
+  if (obj.p !== undefined) return obj.p;
+  if (!key) return "[no shared key established]";
+  try {
+    const ct = Uint8Array.from(atob(obj.e), c => c.charCodeAt(0));
+    const iv = Uint8Array.from(atob(obj.iv), c => c.charCodeAt(0));
+    const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, ct);
+    return new TextDecoder().decode(pt);
+  } catch { return "[decryption failed — key mismatch]"; }
+}
+
+function waitForIce() {
+  return new Promise(res => {
+    if (pc.iceGatheringState === "complete") return res();
+    pc.addEventListener("icegatheringstatechange", () => {
+      if (pc.iceGatheringState === "complete") res();
+    });
+  });
+}
+
+function newPeer() {
+  pc = new RTCPeerConnection(ICE);
+  pc.onconnectionstatechange = () => {
+    const s = pc.connectionState;
+    if (s === "connected") setStatus("Online", true);
+    else if (s === "disconnected" || s === "failed" || s === "closed") {
+      setStatus("Peer disconnected", false);
+      lockInput("peer disconnected");
+    }
+  };
+}
+
+function wireChannel() {
+  dc.onopen = () => {
+    setStatus("Online", true);
+    enterChat();
+  };
+  dc.onclose = () => { setStatus("Channel closed", false); lockInput("channel closed"); };
+  dc.onmessage = async e => addMsg(await decrypt(e.data), "them");
+}
+
+async function pickRole(r) {
+  role = r;
+  sessionActive = true;
+  await genKeyPair();
+  $("roleA").classList.toggle("sel", r === "A");
+  $("roleB").classList.toggle("sel", r === "B");
+  ["A1","A2","B1","B2"].forEach(s => $(s).classList.remove("on"));
+  if (r === "A") await hostStart();
+  else $("B1").classList.add("on");
+  showSetup();
+  updateNavState();
+}
+
+async function hostStart() {
+  newPeer();
+  dc = pc.createDataChannel("chat");
+  wireChannel();
+  const offer = await pc.createOffer();
+  await pc.setLocalDescription(offer);
+  await waitForIce();
+  const code = await pack(pc.localDescription, myPubJwkB64);
+  showInviteCode("A_offer", "A_qr", "A_qr_frame", code);
+  $("A1").classList.add("on");
+  $("A2").classList.add("on");
+  setStatus("Waiting for peer reply");
+}
+
+async function hostAccept() {
+  try {
+    const { s: ans, k: peerPub } = await unpack($("A_answer").value);
+    await deriveSharedKey(peerPub);
+    await pc.setRemoteDescription(ans);
+    setStatus("Connecting…");
+  } catch { alert("Couldn't read that reply code — check it was copied fully."); }
+}
+
+async function joinGenerate() {
+  try {
+    const { s: offer, k: peerPub } = await unpack($("B_offer").value);
+    newPeer();
+    pc.ondatachannel = e => { dc = e.channel; wireChannel(); };
+    await pc.setRemoteDescription(offer);
+    await deriveSharedKey(peerPub);
+    const answer = await pc.createAnswer();
+    await pc.setLocalDescription(answer);
+    await waitForIce();
+    const code = await pack(pc.localDescription, myPubJwkB64);
+    showInviteCode("B_answer", "B_qr", "B_qr_frame", code);
+    $("B2").classList.add("on");
+    setStatus("Waiting for peer to connect");
+  } catch { alert("Couldn't read that invite code — check it was copied fully."); }
+}
+
+function formatTime(d = new Date()) {
+  return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+}
+
+function enterChat() {
+  showView("chat");
+  $("input").disabled = false;
+  $("send").disabled = false;
+  $("attachBtn").disabled = false;
+  headerTitle.textContent = "Peer";
+  avatar.textContent = "P";
+  sessionActive = true;
+  $("input").focus();
+  addSys("Messages are end-to-end encrypted");
+  if (safetyNumber) addSys("Safety number: <strong>" + safetyNumber + "</strong>");
+  updateNavState();
+}
+
+function lockInput(reason) {
+  $("input").disabled = true;
+  $("send").disabled = true;
+  $("attachBtn").disabled = true;
+  addSys(reason);
+}
+
+function addMsg(text, who) {
+  const row = document.createElement("div");
+  row.className = "msg-row " + who;
+  const wrap = document.createElement("div");
+  wrap.className = "bubble-wrap";
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+  
+  const isFile = text.startsWith("FILE_ATTACHMENT::");
+  const span = document.createElement("span");
+  span.className = "bubble-text";
+  
+  if (isFile) {
+    const sepIdx = text.indexOf("::", 17);
+    if (sepIdx !== -1) {
+      const fname = text.substring(17, sepIdx);
+      const fdata = text.substring(sepIdx + 2);
+      
+      if (!fdata.startsWith("data:")) {
+        span.textContent = "[Security Alert: Blocked dangerous file payload]";
+        span.style.color = "#ef4444";
+      } else {
+        if (fdata.startsWith("data:image/")) {
+          const img = document.createElement("img");
+          img.src = fdata;
+          img.className = "bubble-img";
+          img.alt = fname;
+          img.title = fname;
+          span.appendChild(img);
+        } else {
+          const a = document.createElement("a");
+          a.href = fdata;
+          a.download = fname;
+          a.className = "bubble-file";
+          a.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
+          const nameSpan = document.createElement("span");
+          nameSpan.textContent = " " + fname;
+          a.appendChild(nameSpan);
+          span.appendChild(a);
+        }
+      }
+    }
+  } else {
+    span.textContent = text;
+  }
+
+  const meta = document.createElement("span");
+  meta.className = "bubble-meta";
+
+  const copyBtn = document.createElement("button");
+  if (isFile) copyBtn.style.display = "none";
+  copyBtn.className = "msg-copy-btn";
+  copyBtn.title = "Copy message";
+  copyBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+  copyBtn.onclick = () => {
+    navigator.clipboard.writeText(text);
+    const oldHtml = copyBtn.innerHTML;
+    copyBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+    setTimeout(() => copyBtn.innerHTML = oldHtml, 2000);
+  };
+
+  const time = document.createElement("span");
+  time.className = "bubble-time";
+  time.textContent = formatTime();
+  meta.append(copyBtn, time);
+  bubble.append(span, meta);
+  wrap.append(bubble);
+  row.append(wrap);
+  $("log").append(row);
+  $("log").scrollTop = $("log").scrollHeight;
+}
+
+function addSys(text) {
+  const el = document.createElement("div");
+  el.className = "sys";
+  const pill = document.createElement("span");
+  pill.className = "sys-pill";
+  pill.innerHTML = text;
+  el.append(pill);
+  $("log").append(el);
+  $("log").scrollTop = $("log").scrollHeight;
+}
+
+async function send() {
+  const v = $("input").value.trim();
+  if (!v || !dc || dc.readyState !== "open") return;
+  dc.send(await encrypt(v));
+  addMsg(v, "me");
+  $("input").value = "";
+  $("input").style.height = "22px";
+}
+$("input").addEventListener("keydown", e => { 
+  if (e.key === "Enter" && !e.shiftKey) { 
+    e.preventDefault(); 
+    send(); 
+  } 
+});
+$("input").addEventListener("input", function() {
+  this.style.height = "22px";
+  this.style.height = Math.min(this.scrollHeight, 120) + "px";
+});
+
+$("fileInput").addEventListener("change", function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  e.target.value = ""; 
+  if (file.size > 250 * 1024) {
+    alert("File is too large! Please select a file under 250KB.");
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = async (ev) => {
+    const dataUrl = ev.target.result;
+    const msgStr = "FILE_ATTACHMENT::" + file.name + "::" + dataUrl;
+    try {
+      if (!dc || dc.readyState !== "open") return;
+      dc.send(await encrypt(msgStr));
+      addMsg(msgStr, "me");
+    } catch (err) {
+      alert("Failed to send file. It might be too large for a single WebRTC message.");
+    }
+  };
+  reader.readAsDataURL(file);
+});
+
+function copyEl(id) {
+  const el = $(id);
+  navigator.clipboard.writeText(el.value).then(() => {
+    const tag = id === "A_offer" ? "A_copied" : "B_copied";
+    $(tag).innerHTML = "✓ Copied";
+    setTimeout(() => $(tag).textContent = "", 2000);
+  });
+}
+
+window.addEventListener("pagehide", () => { closeConnection(); });
+setStatus("Offline");
+updateNavState();
+</script>
+</body>
+</html>
