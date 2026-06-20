@@ -49,7 +49,9 @@ Ephemeral employs military-grade cryptography to secure the P2P transport layer 
 ## ✨ Technical Features
 
 - **Direct P2P Architecture**: True zero-trust, serverless infrastructure.
-- **Encrypted File Transfer**: Seamlessly transmit files up to 250KB over the encrypted tunnel.
+- **Encrypted File Transfer (100MB limit)**: A custom-built WebRTC Chunking Engine fragments massive files into thousands of 16KB encrypted packets, reassembling them securely in the receiver's memory via `Uint8Array` Blob stitching.
+- **Advanced Flow Control**: Built-in network backpressure algorithms monitor the WebRTC Data Channel `bufferedAmount`, automatically pausing and resuming uploads to prevent buffer overflows and browser crashes.
+- **Real-time Transfer UI**: Dynamic progress bars track the precise chunking progression for both sender and receiver.
 - **Strict Payload Validation**: Automated mitigation against DOM-based Cross-Site Scripting (XSS) and protocol injection vectors via rigorous Data URI filtering.
 - **Responsive UI/UX**: A state-of-the-art glassmorphic interface optimized for both desktop and mobile environments.
 - **Offline Resilience**: Capable of operating entirely over local network signaling without external dependencies.
