@@ -72,7 +72,9 @@ npx http-server -p 8080
 
 ## ⚖️ Legal & Liability Disclaimer
 
-This software is provided "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and non-infringement. In no event shall the authors or copyright holders (Zrnge) be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the software. Users are solely responsible for ensuring their communications comply with applicable local laws and regulations.
+This application is provided "as is", strictly for legitimate and educational purposes. **The developer (Zrnge) assumes absolutely no responsibility or liability for any illegal activities, crimes, or misuse of this software by any individual or entity.** 
+
+By using Ephemeral, you acknowledge that you are solely responsible for ensuring your communications comply with all applicable local, state, and international laws. In no event shall the developer be liable for any claim, damages, or other liability arising from the use of this software.
 
 ---
 <div align="center">
