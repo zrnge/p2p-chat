@@ -66,6 +66,14 @@
           <span id="status">Offline</span>
         </div>
       </div>
+      <div class="ip-warning" id="ipWarning">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span id="publicIpTxt">IP: Fetching...</span>
+        <div class="ip-tooltip">
+          <strong>IP Leak Warning</strong><br>
+          Your public IP is exposed to strangers over WebRTC. Always use a trusted VPN for anonymity!
+        </div>
+      </div>
       <span class="badge">E2E encrypted</span>
       <div class="topbar-actions" id="topbarActions">
         <button class="nav-btn danger" onclick="location.reload()" aria-label="Exit chat" title="Exit session">
@@ -85,14 +93,6 @@
 
     <div class="content">
       <section class="setup-view" id="setupView">
-        <div class="ip-warning" id="ipWarning">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          <span id="publicIpTxt">IP: Fetching...</span>
-          <div class="ip-tooltip">
-            <strong>IP Leak Warning</strong><br>
-            Your public IP is exposed to strangers over WebRTC. Always use a trusted VPN for anonymity!
-          </div>
-        </div>
         <section class="setup" id="setup">
           <div class="setup-inner">
             <div class="welcome">
@@ -323,21 +323,6 @@ function showView(view) {
   $("setupView").style.display = view === "setup" ? "flex" : "none";
   $("chat").classList.toggle("on", view === "chat");
   $("docs").classList.toggle("on", view === "docs");
-  
-  const ipW = $("ipWarning");
-  if (ipW) {
-    if (view === "chat") {
-      $("topbarActions").insertBefore(ipW, $("topbarActions").firstChild);
-      ipW.style.position = "relative";
-      ipW.style.top = "auto";
-      ipW.style.right = "auto";
-    } else {
-      $("setupView").appendChild(ipW);
-      ipW.style.position = "absolute";
-      ipW.style.top = "16px";
-      ipW.style.right = "16px";
-    }
-  }
   updateNavState();
 }
 
