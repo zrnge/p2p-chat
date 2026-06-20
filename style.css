@@ -493,6 +493,7 @@ body {
 .setup {
   max-width: 520px;
   width: 100%;
+  margin: auto 0;
 }
 
 /* IP Warning Pill */
@@ -749,7 +750,7 @@ textarea[readonly] { color: var(--text-2); }
   position: relative;
   flex: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   padding: 40px;
   background: transparent;

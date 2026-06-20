@@ -626,6 +626,21 @@ function wireChannel() {
         renderFinalFileBubble(id, f.name, f.type, objectUrl, "them");
         delete incomingFiles[id];
       }
+    } else if (text.startsWith("FILE_ATTACHMENT::")) {
+      const sepIdx = text.indexOf("::", 17);
+      if (sepIdx !== -1) {
+        const fname = text.substring(17, sepIdx);
+        const fdata = text.substring(sepIdx + 2);
+        if (fdata.startsWith("data:")) {
+          const fileId = Math.random().toString(36).substring(2);
+          createProgressBubble(fileId, fname, "them");
+          updateProgressBubble(fileId, 100);
+          const fileType = fdata.startsWith("data:image/") ? "image/" : "application/octet-stream";
+          renderFinalFileBubble(fileId, fname, fileType, fdata, "them");
+        } else {
+          addMsg("[Security Alert: Blocked dangerous legacy payload]", "them");
+        }
+      }
     } else {
       addMsg(text, "them");
     }
