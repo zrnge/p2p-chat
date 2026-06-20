@@ -574,9 +574,11 @@ function wireChannel() {
     enterChat();
   };
   dc.onclose = () => { setStatus("Channel closed", false); lockInput("channel closed"); };
-  dc.onmessage = async e => {
-    const text = await decrypt(e.data);
-    if (text.startsWith("FILE_META::")) {
+  let msgQueue = Promise.resolve();
+  dc.onmessage = e => {
+    msgQueue = msgQueue.then(async () => {
+      const text = await decrypt(e.data);
+      if (text.startsWith("FILE_META::")) {
       const parts = text.split("::");
       const id = parts[1], name = parts[2], size = parseInt(parts[3]), type = parts[4];
       incomingFiles[id] = { name, size, type, chunks: [], receivedBytes: 0 };
@@ -629,6 +631,7 @@ function wireChannel() {
     } else {
       addMsg(text, "them");
     }
+    }).catch(err => console.error("Message processing error:", err));
   };
 }
 
